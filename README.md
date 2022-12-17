@@ -1,45 +1,32 @@
-# eBPF TPROXY implementation
+# skb-prio
 
-This repository demos a BPF based iptables TPROXY implementation.
-
-## Building
-
+Quickstart:
 ```
 $ cargo build
 ```
 
-## Demo
-
-In terminal 1, run:
-
+Run in one terminal, using whatever ifindexes you want:
 ```
-$ sudo ./target/debug/proxy --addr 127.0.0.1 --port 9999
+$ sudo ./target/debug/prio --ifindex-ingress 1 --ifindex-egress 1
 ```
 
-This is the proxy server. It will received the TPROXY'd packets.
-
-In terminal 2, run:
-
+Run in another terminal:
 ```
-$ sudo ./target/debug/tproxy --ifindex 1 --port 1003 --proxy-addr 127.0.0.1 --proxy-port 9999
+$ ping localhost
 ```
 
-This is the BPF based TPROXY driver. We are telling `tproxy` to watch ingress on
-ifindex 1 (usually `lo`) and proxy TCP packets arriving on port 1003 to the proxy
-which is listening with `IP_TRANSPARENT` on `localhost:9999`.
-
-Finally, in terminal 3, run:
-
+In the first window you should see something like:
 ```
-$ echo asdf | nc -s 127.0.0.5 127.0.0.1 1003
-```
+set=0, found=0
+set=0, found=0
+set=0, found=0
+set=2, found=0
+set=4, found=0
+set=6, found=0
+set=8, found=0
+set=10, found=0
+set=12, found=0
+set=14, found=0
+^C%
 
-This sends a message via TCP to `127.0.0.1:1003`.
-
-In terminal 1 you should now see something like:
-
-```
-New connection:
-        local: 127.0.0.1:1003
-        peer: 127.0.0.5:58783
 ```
