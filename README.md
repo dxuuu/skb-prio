@@ -34,6 +34,8 @@ set=1, found=0
 
 ```
 
+This implies that `skb->priority` is not preserved during encap.
+
 ### Details
 
 Basically `setup.sh` creates 2 network namespaces: ns1 and ns2.
