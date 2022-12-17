@@ -6,6 +6,7 @@ use std::time::Duration;
 use anyhow::{Context, Result};
 use clap::Parser;
 use libbpf_rs::{TcHookBuilder, TC_EGRESS, TC_INGRESS};
+use netns_rs::NetNs;
 
 mod prio {
     include!(concat!(env!("OUT_DIR"), "/prio.skel.rs"));
@@ -19,6 +20,8 @@ struct Command {
     ifindex_ingress: i32,
     #[clap(long)]
     ifindex_egress: i32,
+    #[clap(long)]
+    netns: Option<String>,
     /// Verbose debug output
     #[clap(short, long)]
     verbose: bool,
@@ -26,6 +29,12 @@ struct Command {
 
 fn main() -> Result<()> {
     let opts = Command::parse();
+
+    // Switch to target netns if requested
+    if let Some(n) = opts.netns {
+        let netns = NetNs::get(n).context("Failed to get ingress netns")?;
+        netns.enter().context("Failed to enter ingress netns")?;
+    }
 
     // Install Ctrl-C handler
     let running = Arc::new(AtomicBool::new(true));
