@@ -70,7 +70,7 @@ fn main() -> Result<()> {
     // Set up and attach egress TC hook
     let mut egress = TcHookBuilder::new()
         .fd(skel.progs().egress().fd())
-        .ifindex(opts.ifindex_ingress)
+        .ifindex(opts.ifindex_egress)
         .replace(true)
         .handle(1)
         .priority(1)
